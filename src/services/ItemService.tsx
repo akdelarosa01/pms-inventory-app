@@ -4,7 +4,7 @@ import { EditIcon } from "@chakra-ui/icons";
 import AxiosService from "./AxiosService";
 import HelperService from "./HelperService";
 
-class ItemServices {
+class ItemService {
   private _helper;
 
   constructor() {
@@ -94,15 +94,15 @@ class ItemServices {
   };
 
   add = (param: any) => {
-    AxiosService.post("/items", param);
+    return AxiosService.post("/items", param);
   };
 
   update = (param: any) => {
     return AxiosService.put("/items/" + param.id, param);
   };
 
-  delete = (id: number) => {
-    return AxiosService.delete("/items-delete", { params: id });
+  delete = (param: any) => {
+    return AxiosService.delete("/items-delete", { params: param });
   };
 
   details = (id: number) => {
@@ -110,4 +110,4 @@ class ItemServices {
   };
 }
 
-export default ItemServices;
+export default ItemService;

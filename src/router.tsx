@@ -32,7 +32,7 @@ const router = createBrowserRouter([
         element: <ItemList />,
       },
       {
-        path: "/items/new",
+        path: "/items/create",
         element: <AddItem />,
       },
       {

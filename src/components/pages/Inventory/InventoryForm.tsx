@@ -579,6 +579,9 @@ const InventoryForm = ({ id }: props) => {
 
   const handleInputOnChange = (e: any) => {
     switch (e.target.name) {
+      case "warehouse":
+        set_warehouse_input(e.target.value);
+        break;
       case "heat_no":
         set_heat_no_input(e.target.value);
         break;

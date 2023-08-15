@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import DataTable from "react-data-table-component";
 import Swal from "sweetalert2";
@@ -31,9 +31,10 @@ const InventoryList = () => {
   const [search, setSearch] = useState<string>("");
   const [selectedData, setSelectedData] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const dataFetchedRef = useRef<boolean>(false);
 
-  const inventory = new InventoryService();
-  const message = new MessageService();
+  const _inventory = new InventoryService();
+  const _message = new MessageService();
 
   let filteredItem = [];
   const options = [
@@ -47,7 +48,7 @@ const InventoryList = () => {
     []
   );
 
-  const colObj: any[] = useMemo(() => inventory.inventoryColumn, []);
+  const colObj: any[] = useMemo(() => _inventory.inventoryColumn, []);
 
   // Design variables
   const flexDesign = {
@@ -63,6 +64,9 @@ const InventoryList = () => {
   };
 
   useEffect(() => {
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
+
     getInventoryList();
     getWarehouses();
   }, []);
@@ -72,7 +76,7 @@ const InventoryList = () => {
     setPending(true);
     setColumns(colObj);
 
-    await inventory
+    await _inventory
       .allData()
       .then(({ data }) => {
         setPending(false);
@@ -81,7 +85,7 @@ const InventoryList = () => {
       .catch((err) => {
         if (err.response != undefined) {
           const errMessage = err.response.data;
-          message.error(errMessage);
+          _message.error(errMessage);
         }
       })
       .finally(() => {
@@ -90,7 +94,7 @@ const InventoryList = () => {
   };
 
   const getWarehouses = async () => {
-    await inventory
+    await _inventory
       .warehouses()
       .then(({ data }) => {
         setWarehouseOption(data);
@@ -98,7 +102,7 @@ const InventoryList = () => {
       .catch((err) => {
         if (err.response != undefined) {
           const errMessage = err.response.data;
-          message.error(errMessage);
+          _message.error(errMessage);
         }
       })
       .then(() => {
@@ -130,11 +134,11 @@ const InventoryList = () => {
                 user_id: User.id,
               };
               setLoading(true);
-              inventory
+              _inventory
                 .delete(param)
                 .then((response) => {
                   try {
-                    message.messageRedirect(response.data);
+                    _message.messageRedirect(response.data);
                     setInventories(response.data.data);
                   } catch (error) {
                     console.log(error);
@@ -143,7 +147,7 @@ const InventoryList = () => {
                 .catch((err) => {
                   if (err.response != undefined) {
                     const errMessage = err.response.data;
-                    message.error(errMessage);
+                    _message.error(errMessage);
                   }
                 })
                 .then(() => {
@@ -161,7 +165,7 @@ const InventoryList = () => {
           }
         });
     } else {
-      message.messageRedirect({
+      _message.messageRedirect({
         message: "Please select at least 1 Item.",
         status: "warning",
       });
@@ -188,13 +192,15 @@ const InventoryList = () => {
     let item_type = i.item_type != null ? i.item_type : "";
     let item_desc = i.item_desc != null ? i.item_desc : "";
     let item = i.item != null ? i.item : "";
+    let heat_no = i.heat_no != null ? i.heat_no : "";
 
     let itemArr =
       i.item_category.toLocaleLowerCase().includes(category) &&
       i.warehouse.toLocaleLowerCase().includes(warehouse) &&
       (item_type.toLocaleLowerCase().includes(search) ||
         item_desc.toLocaleLowerCase().includes(search) ||
-        item.toLocaleLowerCase().includes(search));
+        item.toLocaleLowerCase().includes(search) ||
+        heat_no.toLocaleLowerCase().includes(search));
 
     return itemArr;
   });
