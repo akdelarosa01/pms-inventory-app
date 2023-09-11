@@ -1,11 +1,7 @@
 import axios from "axios";
 
 const AxiosService = axios.create({
-    baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`,
-    headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-type': 'application/json',
-    },
+    baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`
 });
 
 AxiosService.interceptors.request.use( (axiosRequestConfig) => {
