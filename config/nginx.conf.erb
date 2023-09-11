@@ -37,6 +37,11 @@ http {
                 keepalive_timeout 5;
                 root /dist;
 
+                location = /index.html {
+                    add_header Cache-Control "no-store, no-cache";
+                    try_files $uri $uri/ =404;
+                }
+
                 location / {
                         # Uncomment this if statement to force SSL/redirect http -> https
                         # if ($http_x_forwarded_proto != "https") {   
